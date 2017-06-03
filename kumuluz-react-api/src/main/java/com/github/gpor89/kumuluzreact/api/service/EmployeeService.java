@@ -15,4 +15,10 @@ public interface EmployeeService {
 
     Employee getById(Long employeeId);
 
+    Employee create(Employee employee);
+
+    Employee update(Employee employee);
+
+    void delete(Long employeeId);
+
 }

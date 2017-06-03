@@ -18,6 +18,7 @@ public class JaxRsConfig extends ResourceConfig {
         packages("com.github.gpor89.kumuluzreact.rest");
 
         register(RestExceptionMapper.class);
+        register(ResponseHeaderFilter.class);
 
         //property(ServerProperties.TRACING, "ALL");
         LOG.info("REST config initialized");

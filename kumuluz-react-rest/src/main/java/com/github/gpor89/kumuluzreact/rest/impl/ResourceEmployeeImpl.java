@@ -4,13 +4,16 @@ import com.github.gpor89.kumuluzreact.api.model.Employee;
 import com.github.gpor89.kumuluzreact.api.service.EmployeeService;
 import com.github.gpor89.kumuluzreact.rest.ResourceEmployee;
 import com.github.gpor89.kumuluzreact.rest.model.EmployeeJson;
+import com.github.gpor89.kumuluzreact.rest.util.RestUtil;
 import com.kumuluz.ee.logs.LogManager;
 import com.kumuluz.ee.logs.Logger;
 import com.kumuluz.ee.logs.cdi.Log;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +27,9 @@ public class ResourceEmployeeImpl implements ResourceEmployee {
 
     private static final Logger LOG = LogManager.getLogger(ResourceEmployeeImpl.class.getName());
 
+    @Context
+    private UriInfo uri;
+
     @Inject
     private EmployeeService employeeService;
 
@@ -34,7 +40,7 @@ public class ResourceEmployeeImpl implements ResourceEmployee {
 
         final List<Employee> all = employeeService.getByPage(page, pageSize);
 
-        for(Employee e : all) {
+        for (Employee e : all) {
             result.add(new EmployeeJson(e));
         }
 
@@ -46,7 +52,7 @@ public class ResourceEmployeeImpl implements ResourceEmployee {
 
         final Employee employee = employeeService.getById(employeeId);
 
-        if(employee == null) {
+        if (employee == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
@@ -54,20 +60,32 @@ public class ResourceEmployeeImpl implements ResourceEmployee {
     }
 
     @Override
-    public Response createEmployee(EmployeeJson employee) {
-        //TODO: implement
-        return Response.status(Response.Status.NOT_FOUND).build();
+    public Response createEmployee(final EmployeeJson employee) {
+
+        final Employee e = employeeService.create(employee.toEmployee());
+
+        final EmployeeJson result = new EmployeeJson(e);
+
+        return Response.created(RestUtil.buildCreatedLink(uri, e)).entity(result).build();
     }
 
     @Override
     public Response updateEmployee(Long employeeId, EmployeeJson employee) {
-        //TODO: implement
-        return Response.status(Response.Status.NOT_FOUND).build();
+
+        employee.setId(employeeId);
+
+        final Employee e = employeeService.update(employee.toEmployee());
+
+        final EmployeeJson result = new EmployeeJson(e);
+
+        return Response.created(RestUtil.buildCreatedLink(uri, e)).entity(result).build();
     }
 
     @Override
     public Response deleteEmployee(Long employeeId) {
-        //TODO: implement
-        return Response.status(Response.Status.NOT_FOUND).build();
+
+        employeeService.delete(employeeId);
+
+        return Response.noContent().build();
     }
 }
